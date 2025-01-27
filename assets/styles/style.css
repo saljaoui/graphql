@@ -1,0 +1,143 @@
+@keyframes fromTO {
+    0% {
+      opacity: 0;
+    }
+  
+    100% {
+      opacity: 1;
+    }
+  }
+
+/* Version 1 - Ocean Theme */
+:root {
+    --color-light: #424242;
+    --color-mid: #303030;
+    --color-dark: #212121;
+    --color-white: #ffffff;
+    --color-background: #1a1a1a;
+    --color-action-hover: #666666;
+    --color-logo: #808080;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  body {
+    background: var(--color-background);
+    background: radial-gradient(
+      circle at top,
+      var(--color-mid) 0%,
+      var(--color-dark) 100%
+    );
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    color: var(--color-white);
+  }
+  
+  .sectionLogin {
+    animation: fromTO 1s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .wrapper {
+    position: relative;
+    max-width: 400px;
+    background: transparent;
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transition: height 0.2s ease;
+  }
+  
+  .wrapper .form-box {
+    width: 100%;
+    padding: 40px;
+  }
+  
+  .form-box h2 {
+    font-size: 2em;
+    color: var(--color-white);
+    text-align: center;
+  }
+
+  .input-box {
+    position: relative;
+    width: 100%;
+    height: 43px;
+    border-bottom: 2px solid var(--color-white);
+    margin: 30px 0;
+  }
+  
+  .input-box label {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    font-size: 1em;
+    color: var(--color-white);
+    pointer-events: none;
+    transition: 0.5s;
+  }
+  
+  .input-box input:focus ~ label,
+  .input-box input:valid ~ label {
+    top: -5px;
+  }
+  
+  .input-box input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1em;
+    color: var(--color-white);
+    font-weight: 600;
+    padding: 0 35px 0 5px;
+  }
+  
+  .input-box .icon {
+    position: absolute;
+    right: 8px;
+    font-size: 1.2em;
+    color: var(--color-white);
+    line-height: 57px;
+  }
+  
+  .wrapper .btn {
+    width: 100%;
+    height: 45px;
+    background: var(--color-action-hover);
+    border: none;
+    outline: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    color: var(--color-white);
+    font-weight: 500;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+    transition: all 0.5s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .wrapper .btn:hover {
+    background-color: var(--color-logo);
+  }
+  
