@@ -10,10 +10,26 @@ export async function createSectionProfile() {
         },
         body: JSON.stringify({
             query: `{
-                user {
-                    id
-                    login
+             user {
+                id
+                login
+              }
+              progress(
+                where: {
+                  _and: [
+                    { object: { type: { _eq: "project" } } },
+                    { grade: { _is_null: false } }
+                  ]
                 }
+              ) {
+                objectId
+                grade
+                path
+                object {
+                  name
+                  type
+                }
+              }
             }`
         }),
     });
