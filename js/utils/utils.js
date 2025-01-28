@@ -23,3 +23,7 @@ export function createInputBox(type, id, labelText, svgIcon) {
 
     return inputBox;
 }
+
+export function cleanUp(element) {
+    element?.remove()
+}

@@ -1,4 +1,4 @@
-import { createElementWithClass, createInputBox } from '../utils/utils.js'
+import { createElementWithClass, createInputBox, cleanUp } from '../utils/utils.js'
 import { createSectionProfile } from '../components/profile.js'
 
 export function createSectionLogin() {
@@ -73,6 +73,11 @@ function addEventButton(button, section) {
                 openAnimationDiv.remove();
                 createSectionProfile()
             }, 1500)
+            
+            setTimeout(()=> {
+                const wrapper = document.querySelector('.wrapper')
+                cleanUp(wrapper)
+            }, 500)
         }
     })
 }
