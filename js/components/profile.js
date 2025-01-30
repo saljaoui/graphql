@@ -1,5 +1,7 @@
 import { createElementWithClass, cleanUp } from '../utils/utils.js'
 
+let cumulativeXP = 0;
+
 export async function createSectionProfile() {
 
     const response = await fetch('https://learn.zone01oujda.ma/api/graphql-engine/v1/graphql', {
@@ -13,6 +15,12 @@ export async function createSectionProfile() {
   user {
     firstName
     lastName
+    auditRatio
+    transactions(where: { type: { _like: "skill_%" } }) {
+      id
+      type
+      amount
+    }
   }
   transaction(where : { _and : [{type : {_eq : "xp"}},
     {eventId : {_eq : 41}}
@@ -38,18 +46,104 @@ export async function createSectionProfile() {
     }
 
 }
+
+function createProfilePage(data) {
+  const sectionLogin = document.querySelector('.sectionLogin');
+  cleanUp(sectionLogin);
+
+  const container = createElementWithClass('div', 'profile-page');
+
+  const header = createElementWithClass('header', 'profile-header');
+  const name = createElementWithClass('span', 'user-name', 
+    `Welcome, ${data.data.user[0].firstName} ${data.data.user[0].lastName} !`);
+  const logoutButton = createElementWithClass('button', 'logout-btn', 'Log Out');
+  logoutButton.addEventListener('click', handleLogout);
+
+  header.appendChild(name);
+  header.appendChild(logoutButton);
+  container.appendChild(header);
+
+  const content = createElementWithClass('div', 'profile-content');
+
+  content.appendChild(createXPVisualization(data));
+  content.appendChild(bestSkills(data.data.transaction));
+  content.appendChild(totalXp());
+  content.appendChild(auditRatio(data.data.user[0].auditRatio));
+
+  container.appendChild(content);
+  document.body.appendChild(container);
+
+}
+
+function bestSkills(data) {
+  console.log(data);
+
+  const emptyDiv = createElementWithClass('div', 'content-box');
+  const titleDiv = createElementWithClass('div', 'title', 'Best Skills');
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('height', '100%');
+  svg.setAttribute('width', '100%');
+  svg.setAttribute('viewBox', '0 0 680 303');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('style', 'overflow: visible');
+
+  emptyDiv.appendChild(titleDiv);
+  emptyDiv.appendChild(svg);
+
+  return emptyDiv;
+}
+
+function totalXp() {
+  const emptyDiv = createElementWithClass('div', 'content-box');
+  const titleDiv = createElementWithClass('div', 'title' , 'XP total');
+  let xpText;
+
+  if (cumulativeXP < 1000) {
+    xpText = cumulativeXP + ' B';
+  } else if (cumulativeXP < 1000000) {
+    xpText = Math.round((cumulativeXP / 1000).toFixed(2)) + ' KB';
+  } else {
+    xpText =  Math.round((cumulativeXP / 1000000).toFixed(2)) + ' MB';
+  }
+
+  const xpDiv = createElementWithClass('div', 'content-xp', xpText);
+  emptyDiv.appendChild(titleDiv);
+  emptyDiv.appendChild(xpDiv);
+
+  return emptyDiv;
+}
+
+function auditRatio(ratio) {
+  const emptyDiv = createElementWithClass('div', 'content-box');
+  const titleDiv = createElementWithClass('div', 'title', 'Audit Ratio');
+  const ratioDiv = createElementWithClass('div', 'content-xp', customRound(ratio));
+
+  emptyDiv.appendChild(titleDiv);
+  emptyDiv.appendChild(ratioDiv);
+
+  return emptyDiv;
+}
+
+function customRound(value) {
+  const rounded = Math.round(value);
+  if (value > rounded) {
+    return (Math.round(value * 10) / 10).toFixed(1);
+  }
+  return rounded;
+}
+
 function createXPVisualization(transactionData) {
-  // Sort transactions by date
+
   const sortedData = transactionData.data.transaction.sort((a, b) => 
     new Date(a.createdAt) - new Date(b.createdAt)
   );
 
-  // Calculate cumulative XP
-  let cumulativeXP = 0;
   const dataPoints = sortedData.map(transaction => {
     cumulativeXP += transaction.amount;
     return {
       date: new Date(transaction.createdAt),
+      name: transaction.object.name,
       xp: cumulativeXP
     };
   });
@@ -79,6 +173,8 @@ function createXPVisualization(transactionData) {
   }).join(' ');
 
   const emptyDiv = createElementWithClass('div', 'content-box');
+  const titleDiv = createElementWithClass('div', 'title' , 'XP progression');
+  emptyDiv.appendChild(titleDiv)
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('height', '100%');
   svg.setAttribute('width', '100%');
@@ -88,7 +184,7 @@ function createXPVisualization(transactionData) {
 
   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   path.setAttribute('d', pathData);
-  path.setAttribute('stroke', 'red');
+  path.setAttribute('stroke', 'var(--color-action-hover)');
   path.setAttribute('fill', 'transparent');
   path.setAttribute('stroke-width', '2');
 
@@ -99,32 +195,34 @@ function createXPVisualization(transactionData) {
     
     circle.setAttribute('cx', x);
     circle.setAttribute('cy', y);
-    circle.setAttribute('r', '3');
-    circle.setAttribute('fill', 'red');
+    circle.setAttribute('r', '4');
+    circle.setAttribute('fill', 'var(--color-action-hover)');
     
     circle.addEventListener('mouseover', (e) => {
-      const tooltip = document.createElement('div');
+      circle.setAttribute('r', '6');
+      const tooltip = document.createElement('div', 'tooltip');
       tooltip.className = 'tooltip';
       tooltip.style.position = 'absolute';
       tooltip.style.left = `${e.pageX + 10}px`;
       tooltip.style.top = `${e.pageY - 10}px`;
-      tooltip.style.backgroundColor = 'rgba(0,0,0,0.8)';
       tooltip.style.color = 'white';
       tooltip.style.padding = '5px';
       tooltip.style.borderRadius = '3px';
       tooltip.style.fontSize = '12px';
-      tooltip.style.zIndex = '1000';
+      tooltip.style.zIndex = '10';
+      
       tooltip.innerHTML = `
-        Date: ${point.name.toLocaleDateString()}<br>
+        Name: ${point.name}<br>
         Total XP: ${Math.round(point.xp).toLocaleString()}
       `;
-      document.body.appendChild(tooltip);
       
+      document.body.appendChild(tooltip);
       circle.addEventListener('mouseout', () => {
+        circle.setAttribute('r', '4');
         tooltip.remove();
       });
     });
-    
+
     svg.appendChild(circle);
   });
 
@@ -132,34 +230,6 @@ function createXPVisualization(transactionData) {
   emptyDiv.appendChild(svg);
 
   return emptyDiv;
-}
-
-function createProfilePage(data) {
-    const sectionLogin = document.querySelector('.sectionLogin');
-    cleanUp(sectionLogin);
-
-    const container = createElementWithClass('div', 'profile-page');
-
-    const header = createElementWithClass('header', 'profile-header');
-    const name = createElementWithClass('span', 'user-name', 
-      `Welcome, ${data.data.user[0].firstName} ${data.data.user[0].lastName} !`);
-    const logoutButton = createElementWithClass('button', 'logout-btn', 'Log Out');
-    logoutButton.addEventListener('click', handleLogout);
-
-    header.appendChild(name);
-    header.appendChild(logoutButton);
-    container.appendChild(header);
-
-    const content = createElementWithClass('div', 'profile-content');
-    content.appendChild(createXPVisualization(data));
-
-    for (let i = 0; i < 3; i++) {
-        const emptyDiv = createElementWithClass('div', 'content-box', `Content Box ${i + 1}`);
-        content.appendChild(emptyDiv);
-    }
-
-    container.appendChild(content);
-    document.body.appendChild(container);
 }
 
 function handleLogout() {

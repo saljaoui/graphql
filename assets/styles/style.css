@@ -107,7 +107,23 @@
     color: var(--color-white);
   }
   
-  .sectionLogin {
+ .content-box circle {
+    cursor: pointer;
+    transition: filter 0.3s ease, stroke 0.3s ease;
+    stroke: transparent; 
+    stroke-width: 3px; 
+}
+
+.content-box circle:hover {
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.1)); 
+    stroke: #ffffff;
+}
+
+.tooltip {
+  animation: animationBtn 0.3s ease;
+}
+
+.sectionLogin {
     animation: fromTO 1s ease-in-out;
     display: flex;
     flex-direction: column;
@@ -286,9 +302,18 @@
 
 .profile-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(400px, 2fr));
   gap: 2rem;
   padding: 20px;
+}
+
+.content-xp {
+  display: flex;
+  height: 90%;
+  align-items: center;
+  font-size: 50px;
+  justify-content: center;
+  animation: animationBtn 1.2s ease-in-out;
 }
 
 .content-box {
@@ -307,6 +332,7 @@
 .content-box:nth-child(1) { animation-delay: 0.2s; }
 .content-box:nth-child(2) { animation-delay: 0.4s; }
 .content-box:nth-child(3) { animation-delay: 0.6s; }
+.content-box:nth-child(4) { animation-delay: 0.8s; }
 
 @media (max-width: 768px) {
   .profile-page {
@@ -323,3 +349,6 @@
       grid-template-columns: 1fr;
   }
 }
+
+
+
