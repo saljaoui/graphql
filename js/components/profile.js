@@ -12,19 +12,28 @@ export async function createSectionProfile() {
         },
         body: JSON.stringify({
             query: `{
-  user {
-    firstName
-    lastName
-    auditRatio
-    transactions(where: { type: { _like: "skill_%" } }) {
-      id
-      type
-      amount
+      user {
+      firstName
+      lastName
+      auditRatio
+      transactions(
+        where: { type: { _like: "skill_%" } }
+        order_by: { amount: desc }
+      ) {
+        id
+        type
+        amount
+      }
     }
-  }
-  transaction(where : { _and : [{type : {_eq : "xp"}},
-    {eventId : {_eq : 41}}
-  ]}) {
+  
+  transaction(
+    where: {
+      _and: [
+        { type: { _eq: "xp" } }
+        { eventId: { _eq: 41 } }
+      ]
+    }
+  ) {
     type
     amount
     path
@@ -34,14 +43,14 @@ export async function createSectionProfile() {
       type
       name
     }
-}
+
+  }
 }`
         }),
     });
 
     if (response.ok) {
         const data = await response.json();
-        console.log(data);
         createProfilePage(data)
     }
 
@@ -66,7 +75,7 @@ function createProfilePage(data) {
   const content = createElementWithClass('div', 'profile-content');
 
   content.appendChild(createXPVisualization(data));
-  content.appendChild(bestSkills(data.data.transaction));
+  content.appendChild(bestSkills(data.data.user[0].transactions));
   content.appendChild(totalXp());
   content.appendChild(auditRatio(data.data.user[0].auditRatio));
 
@@ -76,7 +85,16 @@ function createProfilePage(data) {
 }
 
 function bestSkills(data) {
-  console.log(data);
+
+  let bestSkills = [];
+  let sheckSkill = [];
+  data.forEach(ele => {
+    if (sheckSkill.indexOf(ele.type) === -1) {
+      bestSkills.push(ele);
+      sheckSkill.push(ele.type);
+    }
+  });
+
 
   const emptyDiv = createElementWithClass('div', 'content-box');
   const titleDiv = createElementWithClass('div', 'title', 'Best Skills');
@@ -88,12 +106,41 @@ function bestSkills(data) {
   svg.setAttribute('fill', 'none');
   svg.setAttribute('style', 'overflow: visible');
 
+  for (let index = 0; index < Math.min(5, bestSkills.length); index++) {
+    const skill = bestSkills[index];
+
+    const percentage = Math.min(100, Math.max(0, skill.amount));
+    const maxBarHeight = 200;
+    const barHeight = (percentage / 100) * maxBarHeight;
+
+    const xPosition = 10 + (index * 60);
+    const yPosition = 250 - barHeight;
+
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', xPosition.toString());
+    rect.setAttribute('y', yPosition.toString());
+    rect.setAttribute('width', '50');
+    rect.setAttribute('height', barHeight.toString());
+    rect.setAttribute('fill', 'var(--color-action-hover)');
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', (xPosition + 25).toString());
+    text.setAttribute('y', '270'); 
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('fill', 'white');
+    text.textContent = `${percentage}%`;
+    
+    svg.appendChild(rect);
+    svg.appendChild(text);
+  }
+
+
+
   emptyDiv.appendChild(titleDiv);
   emptyDiv.appendChild(svg);
 
   return emptyDiv;
 }
-
 function totalXp() {
   const emptyDiv = createElementWithClass('div', 'content-box');
   const titleDiv = createElementWithClass('div', 'title' , 'XP total');
@@ -154,7 +201,6 @@ function createXPVisualization(transactionData) {
 
   const width = 680;
   const height = 303;
-  const padding = 0;
 
   function scaleX(date) {
     const timeRange = endDate - startDate;
@@ -178,7 +224,7 @@ function createXPVisualization(transactionData) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('height', '100%');
   svg.setAttribute('width', '100%');
-  svg.setAttribute('viewBox', `${-padding} ${-padding} ${width + padding * 2} ${height + padding * 2}`);
+  svg.setAttribute('viewBox', '0 0 680 303');
   svg.setAttribute('fill', 'none');
   svg.setAttribute('style', 'overflow: visible');
 
@@ -187,6 +233,8 @@ function createXPVisualization(transactionData) {
   path.setAttribute('stroke', 'var(--color-action-hover)');
   path.setAttribute('fill', 'transparent');
   path.setAttribute('stroke-width', '2');
+
+  svg.appendChild(path);
 
   dataPoints.forEach((point) => {
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -209,7 +257,6 @@ function createXPVisualization(transactionData) {
       tooltip.style.padding = '5px';
       tooltip.style.borderRadius = '3px';
       tooltip.style.fontSize = '12px';
-      tooltip.style.zIndex = '10';
       
       tooltip.innerHTML = `
         Name: ${point.name}<br>
@@ -226,7 +273,7 @@ function createXPVisualization(transactionData) {
     svg.appendChild(circle);
   });
 
-  svg.appendChild(path);
+  
   emptyDiv.appendChild(svg);
 
   return emptyDiv;
