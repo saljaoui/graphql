@@ -2,6 +2,7 @@ import { createElementWithClass, cleanUp } from '../utils/utils.js'
 
 let cumulativeXP = 0;
 
+
 export async function createSectionProfile() {
 
     const response = await fetch('https://learn.zone01oujda.ma/api/graphql-engine/v1/graphql', {
@@ -51,7 +52,12 @@ export async function createSectionProfile() {
 
     if (response.ok) {
         const data = await response.json();
+        if (data.errors != undefined) {
+          localStorage.removeItem('jwt');
+          location.reload();
+        }
         createProfilePage(data)
+        
     }
 
 }
@@ -102,7 +108,7 @@ function bestSkills(data) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('height', '100%');
   svg.setAttribute('width', '100%');
-  svg.setAttribute('viewBox', '0 0 680 303');
+  svg.setAttribute('viewBox', '-70 0 450 303');
   svg.setAttribute('fill', 'none');
   svg.setAttribute('style', 'overflow: visible');
 
@@ -293,7 +299,6 @@ function createXPVisualization(transactionData) {
         tooltip.remove();
       });
     });
-
     svg.appendChild(circle);
   });
 

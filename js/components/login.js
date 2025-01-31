@@ -1,6 +1,8 @@
 import { createElementWithClass, createInputBox, cleanUp } from '../utils/utils.js'
 import { createSectionProfile } from '../components/profile.js'
 
+let clicked = false
+
 export function createSectionLogin() {
     const section = createElementWithClass('section', 'sectionLogin');
 
@@ -50,6 +52,9 @@ export function createSectionLogin() {
 function addEventButton(button, section) {
     button.addEventListener('click', async () => {
 
+        if (clicked) { return }
+        clicked = true
+
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
@@ -59,9 +64,7 @@ function addEventButton(button, section) {
                 'Authorization': `Basic ${btoa(`${username}:${password}`)}`,
                 'Content-Type': 'application/json',
             },
-
         })
-
         if (response.ok) { 
             const data = await response.json();
             localStorage.setItem('jwt', data)
@@ -78,6 +81,14 @@ function addEventButton(button, section) {
                 const wrapper = document.querySelector('.wrapper')
                 cleanUp(wrapper)
             }, 500)
+        } else {
+            const data = await response.json();
+            const errorMsg = createElementWithClass('div', 'errorMsg', data.error);
+            document.body.appendChild(errorMsg)
+            console.log(data)
+            setTimeout(() => {
+                errorMsg.remove()
+            }, 2500);
         }
     })
 }
