@@ -8,6 +8,23 @@
     }
   }
 
+@keyframes growFromLeft {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes growFromBottom {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
   
 @keyframes openAnimation {
   0% {
@@ -117,6 +134,16 @@
 .content-box circle:hover {
     filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.1)); 
     stroke: #ffffff;
+}
+
+.content-box.Skills svg {
+  transform-origin: bottom;
+animation: growFromBottom 1.3s ease-out;
+}
+
+.content-box svg {
+  transform-origin: left;
+  animation: growFromLeft 1.3s ease-out;
 }
 
 .tooltip {

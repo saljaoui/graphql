@@ -96,7 +96,7 @@ function bestSkills(data) {
   });
 
 
-  const emptyDiv = createElementWithClass('div', 'content-box');
+  const emptyDiv = createElementWithClass('div', 'content-box Skills');
   const titleDiv = createElementWithClass('div', 'title', 'Best Skills');
 
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -122,6 +122,30 @@ function bestSkills(data) {
     rect.setAttribute('width', '50');
     rect.setAttribute('height', barHeight.toString());
     rect.setAttribute('fill', 'var(--color-action-hover)');
+
+    rect.addEventListener('mouseover', (e) => {
+      const tooltip = document.createElement('div', 'tooltip');
+      tooltip.className = 'tooltip';
+      tooltip.style.position = 'absolute';
+      tooltip.style.top = `${e.pageY -  100 }px`;
+      tooltip.style.left = `${e.pageX - 35}px`;
+      tooltip.style.color = 'white';
+      tooltip.style.padding = '5px';
+      tooltip.style.borderRadius = '3px';
+      tooltip.style.fontSize = '12px';
+      
+      tooltip.innerHTML = `
+        Skill: ${skill.type}<br>
+        Total XP:
+      `;
+      
+      document.body.appendChild(tooltip);
+
+      rect.addEventListener('mouseout', () => {
+        tooltip.remove();
+      });
+    });
+
 
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('x', (xPosition + 25).toString());
