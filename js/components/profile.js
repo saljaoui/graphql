@@ -59,7 +59,7 @@ export async function createSectionProfile() {
         createProfilePage(data)
         
     }
-
+    
 }
 
 function createProfilePage(data) {
@@ -152,7 +152,6 @@ function bestSkills(data) {
       });
     });
 
-
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('x', (xPosition + 25).toString());
     text.setAttribute('y', '270'); 
@@ -160,11 +159,9 @@ function bestSkills(data) {
     text.setAttribute('fill', 'white');
     text.textContent = `${percentage}%`;
     
-    svg.appendChild(rect);
+    svg.appendChild(rect); 
     svg.appendChild(text);
   }
-
-
 
   emptyDiv.appendChild(titleDiv);
   emptyDiv.appendChild(svg);
