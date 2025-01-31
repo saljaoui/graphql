@@ -194,20 +194,12 @@ function totalXp() {
 function auditRatio(ratio) {
   const emptyDiv = createElementWithClass('div', 'content-box');
   const titleDiv = createElementWithClass('div', 'title', 'Audit Ratio');
-  const ratioDiv = createElementWithClass('div', 'content-xp', customRound(ratio));
+  const ratioDiv = createElementWithClass('div', 'content-xp', ratio.toFixed(1));
 
   emptyDiv.appendChild(titleDiv);
   emptyDiv.appendChild(ratioDiv);
 
   return emptyDiv;
-}
-
-function customRound(value) {
-  const rounded = Math.round(value);
-  if (value > rounded) {
-    return (Math.round(value * 10) / 10).toFixed(1);
-  }
-  return rounded;
 }
 
 function createXPVisualization(transactionData) {
